@@ -1,0 +1,398 @@
+Script started on 2026-10-09 15:16:51+07:00 [COMMAND="TERM=dumb NO_COLOR=1 bash --noprofile --norc -i" TERM="screen" TTY="/dev/pts/31" COLUMNS="80" LINES="24"]
+bash-5.2$ ls
+ls           lsb_release  lsinitramfs  lslocks      lsmod        lspci
+lsattr       lscpu        lsipc        lslogins     lsns         lsusb
+lsblk        lsfd         lsirq        lsmem        lsof         
+bash-5.2$ ls^C
+bash-5.2$ ch  echo $HIST
+$HISTCMD       $HISTFILE      $HISTFILESIZE  $HISTSIZE      
+bash-5.2$ echo $HIST^C
+bash-5.2$ ус  echo ""$"H"I"S"T"S"i"z"e"" " " I"Z"E"bash-5.2$ echo "$HISTSIZE"
+500
+bash-5.2$ ды -в     ls -d ds  ~/.*
+/home/eltex-pg1-v6/.bash_history  /home/eltex-pg1-v6/.lesshst
+/home/eltex-pg1-v6/.bash_logout   /home/eltex-pg1-v6/.profile
+/home/eltex-pg1-v6/.bashrc	  /home/eltex-pg1-v6/.viminfo
+/home/eltex-pg1-v6/.config
+bash-5.2$ export HISTTIMEFORMAN=''%'F' '%'T'bash-5.2$ export HISTTIMEFORMAN='%F %T'
+bash-5.2$ history
+    1  w
+    2  clear
+    3  ls
+    4  clear
+    5  man -Lru man
+    6  vi
+    7  screen -ls
+    8  screen -S -d
+    9  screen -r
+   10  screen -r top
+   11  screen -S top -d
+   12  screen -ls
+   13  w
+   14  screen -r
+   15  d
+   16  w
+   17  screen -r top
+   18  w
+   19  screen -S top -d -m
+   20  w
+   21  whoami
+   22  hostname
+   23  date
+   24  screen --version
+   25  screen
+   26  screen -S top -d -m top
+   27  screen -ls
+   28  screen -S 78351.top -X quit
+   29  screen -ls
+   30  screen -r 2206210.top
+   31  screen -ls
+   32  screen -r 2206210.top
+   33  screen -ls
+   34  watch /usr/bin/vmstat
+   35  screen -ls
+   36  screen -r 2206210.top
+   37  screen -S report
+   38  screen -ls
+   39  logout
+   40  screen -ls
+   41  screen -r 2321666.report
+   42  vi report_part1.txt
+   43  screen -ls
+   44  screen -d 2321666.report
+   45  screen -r 2321666.report
+   46  screen -d 2321666.report
+   47  screen -r 2321666.report
+   48  screen -D -RR 2321666.report
+   49  screen -ls
+   50  jobs -l
+   51  fg
+   52  cat report_part1.txt
+   53  vi report_part1.txt
+   54  screen -ls
+   55  screen -S 2321666.report -X quit
+   56  watch /usr/bin/vmstat
+   57  screen -r 2206210.top
+   58  watch /usr/bin/vmstat
+   59  GNU Screen version 4.09.00 (GNU) 30-Jan-22
+   60  Copyright (c) 2018-2020 Alexander Naumov, Amadeusz Slawinski
+   61  Copyright (c) 2015-2017 Juergen Weigert, Alexander Naumov, Amadeusz Slawinski
+   62  Copyright (c) 2010-2014 Juergen Weigert, Sadrul Habib Chowdhury
+   63  Copyright (c) 2008-2009 Juergen Weigert, Michael Schroeder, Micah Cowan,
+   64  Sadrul Habib Chowdhury
+   65  Copyright (c) 1993-2007 Juergen Weigert, Michael Schroeder
+   66  Copyright (c) 1987 Oliver Laumann
+   67  This program is free software; you can redistribute it and/or modify it under
+   68  the terms of the GNU General Public License as published by the Free Software
+   69  Foundation; either version 3, or (at your option) any later version.
+   70  This program is distributed in the hope that it will be useful, but WITHOUT
+   71  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+   72  FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   73  You should have received a copy of the GNU General Public License along with
+   74  this program (see the file COPYING); if not, see
+   75  w
+   76  screen -ls
+   77  screen -r 2321666.report
+   78  screen -S 2206210.top -X quit
+   79  screen -s 2190843.pts-17.eltex-2026-autumn -X quit
+   80  screen -ls
+   81  logout
+   82  whoiam
+   83  whoami
+   84  whoaim
+   85  whoami
+   86  screen -S "$(whoami)_part2"
+   87  whoami
+   88  echo "$USER"
+   89  command -v script
+   90  exit
+   91  echo "$HISTSIZE"
+   92  ls -d ~/.*
+   93  export HISTTIMEFORMAN='%F %T'
+   94  history
+bash-5.2$ ^C
+bash-5.2$ historyexport HISTTIMEFORMAN='%F %T'='%F %T' Е='%F %T'='%F %T' T='%F %T'bash-5.2$ export HISTTIMEFORMAT=bash-5.2$ export HISTTIMEFORMAT='bash-5.2$ export HISTTIMEFORMAT='%bash-5.2$ export HISTTIMEFORMAT='%Fbash-5.2$ export HISTTIMEFORMAT='%F bash-5.2$ export HISTTIMEFORMAT='%F %bash-5.2$ export HISTTIMEFORMAT='%F %Tbash-5.2$ export HISTTIMEFORMAT='%F %T'
+bash-5.2$ export HISTTIMEFORMAT='%F %T'bash-5.2$ history                      bash-5.2$ history
+    1  2026-10-09 15:16:51w
+    2  2026-10-09 15:16:51clear
+    3  2026-10-09 15:16:51ls
+    4  2026-10-09 15:16:51clear
+    5  2026-10-09 15:16:51man -Lru man
+    6  2026-10-09 15:16:51vi
+    7  2026-10-09 15:16:51screen -ls
+    8  2026-10-09 15:16:51screen -S -d
+    9  2026-10-09 15:16:51screen -r
+   10  2026-10-09 15:16:51screen -r top
+   11  2026-10-09 15:16:51screen -S top -d
+   12  2026-10-09 15:16:51screen -ls
+   13  2026-10-09 15:16:51w
+   14  2026-10-09 15:16:51screen -r
+   15  2026-10-09 15:16:51d
+   16  2026-10-09 15:16:51w
+   17  2026-10-09 15:16:51screen -r top
+   18  2026-10-09 15:16:51w
+   19  2026-10-09 15:16:51screen -S top -d -m
+   20  2026-10-09 15:16:51w
+   21  2026-10-09 15:16:51whoami
+   22  2026-10-09 15:16:51hostname
+   23  2026-10-09 15:16:51date
+   24  2026-10-09 15:16:51screen --version
+   25  2026-10-09 15:16:51screen
+   26  2026-10-09 15:16:51screen -S top -d -m top
+   27  2026-10-09 15:16:51screen -ls
+   28  2026-10-09 15:16:51screen -S 78351.top -X quit
+   29  2026-10-09 15:16:51screen -ls
+   30  2026-10-09 15:16:51screen -r 2206210.top
+   31  2026-10-09 15:16:51screen -ls
+   32  2026-10-09 15:16:51screen -r 2206210.top
+   33  2026-10-09 15:16:51screen -ls
+   34  2026-10-09 15:16:51watch /usr/bin/vmstat
+   35  2026-10-09 15:16:51screen -ls
+   36  2026-10-09 15:16:51screen -r 2206210.top
+   37  2026-10-09 15:16:51screen -S report
+   38  2026-10-09 15:16:51screen -ls
+   39  2026-10-09 15:16:51logout
+   40  2026-10-09 15:16:51screen -ls
+   41  2026-10-09 15:16:51screen -r 2321666.report
+   42  2026-10-09 15:16:51vi report_part1.txt
+   43  2026-10-09 15:16:51screen -ls
+   44  2026-10-09 15:16:51screen -d 2321666.report
+   45  2026-10-09 15:16:51screen -r 2321666.report
+   46  2026-10-09 15:16:51screen -d 2321666.report
+   47  2026-10-09 15:16:51screen -r 2321666.report
+   48  2026-10-09 15:16:51screen -D -RR 2321666.report
+   49  2026-10-09 15:16:51screen -ls
+   50  2026-10-09 15:16:51jobs -l
+   51  2026-10-09 15:16:51fg
+   52  2026-10-09 15:16:51cat report_part1.txt
+   53  2026-10-09 15:16:51vi report_part1.txt
+   54  2026-10-09 15:16:51screen -ls
+   55  2026-10-09 15:16:51screen -S 2321666.report -X quit
+   56  2026-10-09 15:16:51watch /usr/bin/vmstat
+   57  2026-10-09 15:16:51screen -r 2206210.top
+   58  2026-10-09 15:16:51watch /usr/bin/vmstat
+   59  2026-10-09 15:16:51GNU Screen version 4.09.00 (GNU) 30-Jan-22
+   60  2026-10-09 15:16:51Copyright (c) 2018-2020 Alexander Naumov, Amadeusz Slawinski
+   61  2026-10-09 15:16:51Copyright (c) 2015-2017 Juergen Weigert, Alexander Naumov, Amadeusz Slawinski
+   62  2026-10-09 15:16:51Copyright (c) 2010-2014 Juergen Weigert, Sadrul Habib Chowdhury
+   63  2026-10-09 15:16:51Copyright (c) 2008-2009 Juergen Weigert, Michael Schroeder, Micah Cowan,
+   64  2026-10-09 15:16:51Sadrul Habib Chowdhury
+   65  2026-10-09 15:16:51Copyright (c) 1993-2007 Juergen Weigert, Michael Schroeder
+   66  2026-10-09 15:16:51Copyright (c) 1987 Oliver Laumann
+   67  2026-10-09 15:16:51This program is free software; you can redistribute it and/or modify it under
+   68  2026-10-09 15:16:51the terms of the GNU General Public License as published by the Free Software
+   69  2026-10-09 15:16:51Foundation; either version 3, or (at your option) any later version.
+   70  2026-10-09 15:16:51This program is distributed in the hope that it will be useful, but WITHOUT
+   71  2026-10-09 15:16:51ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+   72  2026-10-09 15:16:51FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+   73  2026-10-09 15:16:51You should have received a copy of the GNU General Public License along with
+   74  2026-10-09 15:16:51this program (see the file COPYING); if not, see
+   75  2026-10-09 15:16:51w
+   76  2026-10-09 15:16:51screen -ls
+   77  2026-10-09 15:16:51screen -r 2321666.report
+   78  2026-10-09 15:16:51screen -S 2206210.top -X quit
+   79  2026-10-09 15:16:51screen -s 2190843.pts-17.eltex-2026-autumn -X quit
+   80  2026-10-09 15:16:51screen -ls
+   81  2026-10-09 15:16:51logout
+   82  2026-10-09 15:16:51whoiam
+   83  2026-10-09 15:16:51whoami
+   84  2026-10-09 15:16:51whoaim
+   85  2026-10-09 15:16:51whoami
+   86  2026-10-09 15:16:51screen -S "$(whoami)_part2"
+   87  2026-10-09 15:16:51whoami
+   88  2026-10-09 15:16:51echo "$USER"
+   89  2026-10-09 15:16:51command -v script
+   90  2026-10-09 15:16:51exit
+   91  2026-10-09 15:32:10echo "$HISTSIZE"
+   92  2026-10-09 15:51:28ls -d ~/.*
+   93  2026-10-09 16:02:10export HISTTIMEFORMAN='%F %T'
+   94  2026-10-09 16:02:21history
+   95  2026-10-09 16:06:40export HISTTIMEFORMAT='%F %T'
+   96  2026-10-09 16:06:43history
+bash-5.2$ вф  date
+Fri Oct  9 04:07:24 PM +07 2026
+bash-5.2$ history | tail
+   89  2026-10-09 15:16:51command -v script
+   90  2026-10-09 15:16:51exit
+   91  2026-10-09 15:32:10echo "$HISTSIZE"
+   92  2026-10-09 15:51:28ls -d ~/.*
+   93  2026-10-09 16:02:10export HISTTIMEFORMAN='%F %T'
+   94  2026-10-09 16:02:21history
+   95  2026-10-09 16:06:40export HISTTIMEFORMAT='%F %T'
+   96  2026-10-09 16:06:43history
+   97  2026-10-09 16:07:24date
+   98  2026-10-09 16:07:54history | tail
+bash-5.2$ grep -n 'date' ""$"H"I"S"T"F"I"L"E"
+23:date
+bash-5.2$ е ЗК  PROMPT_COMMAND=''h'i's't'o'r'y' '-'a'bash-5.2$ PROMPT_COMMAND='history -a'
+bash-5.2$ echg o ""P"R"O"M"T"_"C"O"M"M"A"N"D"_"T"E"S"T"bash-5.2$ echo "PROMT_COMMAND_TEST"
+PROMT_COMMAND_TEST
+bash-5.2$ history | tail
+   93  2026-10-09 16:02:10export HISTTIMEFORMAN='%F %T'
+   94  2026-10-09 16:02:21history
+   95  2026-10-09 16:06:40export HISTTIMEFORMAT='%F %T'
+   96  2026-10-09 16:06:43history
+   97  2026-10-09 16:07:24date
+   98  2026-10-09 16:07:54history | tail
+   99  2026-10-09 16:08:48grep -n 'date' "$HISTFILE"
+  100  2026-10-09 16:28:58PROMPT_COMMAND='history -a'
+  101  2026-10-09 16:29:32echo "PROMT_COMMAND_TEST"
+  102  2026-10-09 16:29:42history | tail
+bash-5.2$ grep -n ""  ''P'R'O'M'P'T'_'C'O'M'M'A'N'D'_'T'E'S'T'bash-5.2$ grep -n 'PROMPT_COMMAND_TEST' ""$"H"I"S"T"F"I"L"E"
+bash-5.2$ grep -n 'PROMPT_COMMAND_TEST' "$HISTFILE"T_COMMAND_TEST' "$HISTFILE" bash-5.2$ grep -n 'PROMbash-5.2$ grep -n 'PROMTbash-5.2$ grep -n 'PROMT_bash-5.2$ grep -n 'PROMT_Cbash-5.2$ grep -n 'PROMT_CObash-5.2$ grep -n 'PROMT_COMbash-5.2$ grep -n 'PROMT_COMMbash-5.2$ grep -n 'PROMT_COMMAbash-5.2$ grep -n 'PROMT_COMMANbash-5.2$ grep -n 'PROMT_COMMANDbash-5.2$ grep -n 'PROMT_COMMAND_bash-5.2$ grep -n 'PROMT_COMMAND_Tbash-5.2$ grep -n 'PROMT_COMMAND_TEbash-5.2$ grep -n 'PROMT_COMMAND_TESbash-5.2$ grep -n 'PROMT_COMMAND_TESTbash-5.2$ grep -n 'PROMT_COMMAND_TEST'bash-5.2$ grep -n 'PROMT_COMMAND_TEST' bash-5.2$ grep -n 'PROMT_COMMAND_TEST' "bash-5.2$ grep -n 'PROMT_COMMAND_TEST' "$bash-5.2$ grep -n 'PROMT_COMMAND_TEST' "$Hbash-5.2$ grep -n 'PROMT_COMMAND_TEST' "$HIbash-5.2$ grep -n 'PROMT_COMMAND_TEST' "$HISbash-5.2$ grep -n 'PROMT_COMMAND_TEST' "$HISTbash-5.2$ grep -n 'PROMT_COMMAND_TEST' "$HISTFbash-5.2$ grep -n 'PROMT_COMMAND_TEST' "$HISTFIbash-5.2$ grep -n 'PROMT_COMMAND_TEST' "$HISTFILbash-5.2$ grep -n 'PROMT_COMMAND_TEST' "$HISTFILE
+113:echo "PROMT_COMMAND_TEST"
+bash-5.2$ ВФ  DATE=$(date + %F)bash-5.2$ DATE=$(date + %F) bash-5.2$ DATE=$(date +%bash-5.2$ DATE=$(date +%Fbash-5.2$ DATE=$(date +%F)
+bash-5.2$ echo ""$"D"A"t"e"" " T"E"bash-5.2$ echo "$DATE"
+2026-10-09
+bash-5.2$ TIME=$(t date +%H:%M:%S)
+bash-5.2$ echo=  ""$"T"i"m"e"" " " T"" I"M"E"bash-5.2$ echo "$TIME"
+16:53:31
+bash-5.2$ DATE_TIME =  =""$"D"A"T"E" "$"T"I"M"E"bash-5.2$ DATE_TIME="$DATE $TIME"
+bash-5.2$ echo ""$ $"D"A"T"E"_"T"I"M"E"bash-5.2$ echo "$DATE_TIME"
+2026-10-09 16:53:31
+bash-5.2$ аш  find 0 -L /bin /sbin -maxdepth 1-type f -type fbash-5.2$ find -L /bin /sbin -maxdepth 1 -bash-5.2$ find -L /bin /sbin -maxdepth 1 -tbash-5.2$ find -L /bin /sbin -maxdepth 1 -tybash-5.2$ find -L /bin /sbin -maxdepth 1 -typbash-5.2$ find -L /bin /sbin -maxdepth 1 -typebash-5.2$ find -L /bin /sbin -maxdepth 1 -type bash-5.2$ find -L /bin /sbin -maxdepth 1 -type fbash-5.2$ find -L /bin /sbin -maxdepth 1 -type f -name ''*'['0'-'9']'*'bash-5.2$ find -L /bin /sbin -maxdepth 1 -type f -name '*[0-9]*' -print
+/bin/ping4
+/bin/pod2html
+/bin/python3.11
+/bin/ssh-argv0
+/bin/c99-gcc
+/bin/x86_64-linux-gnu-gcc-ar-12
+/bin/base64
+/bin/gcov-dump-12
+/bin/x86_64-linux-gnu-gcc-ranlib-12
+/bin/enc2xs
+/bin/x86_64-linux-gnu-gcc
+/bin/gcov-tool-12
+/bin/x86_64-linux-gnu-gcov-12
+/bin/pod2usage
+/bin/x86_64-linux-gnu-lto-dump
+/bin/x86_64
+/bin/x86_64-linux-gnu-objdump
+/bin/addr2line
+/bin/sha224sum
+/bin/py3versions
+/bin/linux32
+/bin/x86_64-linux-gnu-objcopy
+/bin/bzip2
+/bin/pdb3
+/bin/gcc-12
+/bin/x86_64-linux-gnu-readelf
+/bin/x86_64-linux-gnu-gcov-dump
+/bin/x86_64-linux-gnu-ar
+/bin/grub-mkpasswd-pbkdf2
+/bin/x86_64-linux-gnu-gcov-tool
+/bin/traceroute6.db
+/bin/md5sum
+/bin/bzip2recover
+/bin/grub-menulst2cfg
+/bin/x86_64-linux-gnu-cpp-12
+/bin/x86_64-linux-gnu-size
+/bin/x86_64-linux-gnu-gprofng
+/bin/x86_64-linux-gnu-ld
+/bin/x86_64-linux-gnu-gprof
+/bin/h2xs
+/bin/x86_64-linux-gnu-gcc-ranlib
+/bin/x86_64-linux-gnu-ranlib
+/bin/x86_64-linux-gnu-ld.gold
+/bin/x86_64-linux-gnu-as
+/bin/x86_64-linux-gnu-gold
+/bin/pod2text
+/bin/pydoc3
+/bin/x86_64-linux-gnu-nm
+/bin/x86_64-linux-gnu-elfedit
+/bin/x86_64-linux-gnu-strip
+/bin/x86_64-linux-gnu-gcc-nm-12
+/bin/perl5.36.0
+/bin/x86_64-linux-gnu-ld.bfd
+/bin/pydoc3.11
+/bin/x86_64-linux-gnu-gcov-tool-12
+/bin/b2sum
+/bin/c89
+/bin/lto-dump-12
+/bin/x86_64-linux-gnu-cpp
+/bin/x86_64-linux-gnu-lto-dump-12
+/bin/pod2man
+/bin/sha1sum
+/bin/c89-gcc
+/bin/x86_64-linux-gnu-gcc-nm
+/bin/pl2pm
+/bin/ping6
+/bin/h2ph
+/bin/x86_64-linux-gnu-c++filt
+/bin/x86_64-linux-gnu-gcc-ar
+/bin/sha512sum
+/bin/python3
+/bin/x86_64-linux-gnu-gcc-12
+/bin/gcc-ranlib-12
+/bin/x86_64-linux-gnu-gp-display-src
+/bin/base32
+/bin/pygettext3
+/bin/x86_64-linux-gnu-gp-collect-app
+/bin/x86_64-linux-gnu-gcov
+/bin/cpan5.36-x86_64-linux-gnu
+/bin/md5sum.textutils
+/bin/x86_64-linux-gnu-gp-archive
+/bin/sha384sum
+/bin/py3clean
+/bin/x86_64-linux-gnu-gcov-dump-12
+/bin/pdb3.11
+/bin/perl5.36-x86_64-linux-gnu
+/bin/c99
+/bin/x86_64-linux-gnu-strings
+/bin/linux64
+/bin/x86_64-linux-gnu-gp-display-html
+/bin/pygettext3.11
+/bin/systemd-id128
+/bin/x86_64-linux-gnu-dwp
+/bin/gcov-12
+/bin/i386
+/bin/bunzip2
+/bin/cpp-12
+/bin/x86_64-linux-gnu-gp-display-text
+/bin/x86_64-linux-gnu-addr2line
+/bin/py3compile
+/bin/grub-syslinux2cfg
+/bin/traceroute6
+/bin/diff3
+/bin/gcc-nm-12
+/bin/gcc-ar-12
+/bin/sha256sum
+/sbin/dumpe2fs
+/sbin/e2fsck
+/sbin/mkfs.ext3
+/sbin/e2freefrag
+/sbin/e2undo
+/sbin/e2scrub_all
+/sbin/tune2fs
+/sbin/e2image
+/sbin/e2label
+/sbin/e4defrag
+/sbin/e2mmpstatus
+/sbin/mke2fs
+/sbin/mkfs.ext4
+/sbin/mkfs.ext2
+/sbin/e4crypt
+/sbin/killall5
+/sbin/fsck.ext3
+/sbin/fsck.ext2
+/sbin/e2scrub
+/sbin/resize2fs
+/sbin/fsck.ext4
+/sbin/update-grub2
+bash-5.2$ ЗЫ  PS1=''$'{'}'U}'S}'E}'R}'bash-5.2$ PS1='${USER}@'$'{'}'H}'O}'S}'T}'N}'A}'M}'E}'bash-5.2$ PS1='${USER}@${HOSTNAME}-'$'(')'d)'a)'t)'e)' )'+)'%)'H)':)'%)'M)'bash-5.2$ PS1='${USER}@${HOSTNAME}-$(date +%H:%M)>'bash-5.2$ PS1='${USER}@${HOSTNAME}-$(date +%H:%M)bash-5.2$ PS1='${USER}@${HOSTNAME}-$(date +%H:%M)>bash-5.2$ PS1='${USER}@${HOSTNAME}-$(date +%H:%M)>'
+eltex-pg1-v6@eltex-2026-autumn-17:08>и //  | bash --noprofile --norc -i                          export PS1
+eltex-pg1-v6@eltex-2026-autumn-17:25>bash --noprofile --norce  -i
+eltex-pg1-v6@eltex-2026-autumn-17:25>exit
+exit
+eltex-pg1-v6@eltex-2026-autumn-17:25>ьл  mkdir -p ' ""$"H"O"M"E"eltex-pg1-v6@eltex-2026-autumn-17:25>mkdir -p "$HOME"/""$"(")"d)"a)"t)"e)" )"+)"&)")" %)"Y)"eltex-pg1-v6@eltex-2026-autumn-17:25>mkdir -p "$HOME"/"$(date +%Y)eltex-pg1-v6@eltex-2026-autumn-17:25>mkdir -p "$HOME"/"$(date +%Y)"-{}0}1}.}.}1}2}eltex-pg1-v6@eltex-2026-autumn-17:25>mkdir -p "$HOME"/"$(date +%Y)"-{01..12}
+eltex-pg1-v6@eltex-2026-autumn-17:31>ls -d ""$"H"O"M"E"eltex-pg1-v6@eltex-2026-autumn-17:31>ls -d "$HOME"' \ /""$"("d"a"t"e")" )"+)"%)"Y)"eltex-pg1-v6@eltex-2026-autumn-17:31>ls -d "$HOME"/"$(date +%Y)eltex-pg1-v6@eltex-2026-autumn-17:31>ls -d "$HOME"/"$(date +%Y)"-*
+/home/eltex-pg1-v6/2026-01  /home/eltex-pg1-v6/2026-07
+/home/eltex-pg1-v6/2026-02  /home/eltex-pg1-v6/2026-08
+/home/eltex-pg1-v6/2026-03  /home/eltex-pg1-v6/2026-09
+/home/eltex-pg1-v6/2026-04  /home/eltex-pg1-v6/2026-10
+/home/eltex-pg1-v6/2026-05  /home/eltex-pg1-v6/2026-11
+/home/eltex-pg1-v6/2026-06  /home/eltex-pg1-v6/2026-12
+eltex-pg1-v6@eltex-2026-autumn-17:32>уч  exit
+exit
+
+Script done on 2026-10-09 17:35:46+07:00 [COMMAND_EXIT_CODE="0"]
