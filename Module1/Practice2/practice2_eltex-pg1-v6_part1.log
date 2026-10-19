@@ -1,0 +1,228 @@
+3) Проверка ssh ключей:
+$ cat ~/.ssh/id_rsa.pub
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCxDv9+MxXixHXwueqJ1TggM06ZKwu5nqGR0MGEo3cWrNsZ+weKYZStXeqeskNxLhnawnV8JuhpxYuy0wr9Trftn2ovWJU835zGsKBhPXVzncKgVpmsvFBUgul8JKr6uiuKWSw5SdAGy2tcLdNPpigvpYZGQ59QmsK8TVuqKngp2LE99ishlpqMG8n0t3vKDq+srslYZ0iN6BgEotPV+tpR9gMhkcGn9Ca8El+rI6oQt3MHfb5N9oYexLjM01cxJGJfPUc1lsj1CzHIfPoLa4EWFVpG8M+2xF+2qVVRy1YVVbu4wvSn5toeFMjz5XMGfpxfyRlQUXsYEC1aUzAgDMac4RBTfJSZo+yT4iJ1fawxcolu1SGe+B4q8nqT62rGhoNqlC3Km//lM743K1NJiBa6gXBG0hMt9Kcb2Le8/ut/LGrdCZFJmAavqX9r0dtRVbJJdZVietCSdhcJWMnlcBuQW/ZRE+cOTwrAjkMK/V01S6CBI7JPat3M5lEjcAD6UJE= eltex-pg1-v6@eltex-2026-autumn
+$ stat -c '%A (%a) %n' ~/.ssh/id_rsa.pub
+-rw-r--r-- (644) /home/eltex-pg1-v6/.ssh/id_rsa.pub
+
+Результат со второго сервера (root):
+# cat ~/.ssh/authorized_keys
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCxDv9+MxXixHXwueqJ1TggM06ZKwu5nqGR0MGEo3cWrNsZ+weKYZStXeqeskNxLhnawnV8JuhpxYuy0wr9Trftn2ovWJU835zGsKBhPXVzncKgVpmsvFBUgul8JKr6uiuKWSw5SdAGy2tcLdNPpigvpYZGQ59QmsK8TVuqKngp2LE99ishlpqMG8n0t3vKDq+srslYZ0iN6BgEotPV+tpR9gMhkcGn9Ca8El+rI6oQt3MHfb5N9oYexLjM01cxJGJfPUc1lsj1CzHIfPoLa4EWFVpG8M+2xF+2qVVRy1YVVbu4wvSn5toeFMjz5XMGfpxfyRlQUXsYEC1aUzAgDMac4RBTfJSZo+yT4iJ1fawxcolu1SGe+B4q8nqT62rGhoNqlC3Km//lM743K1NJiBa6gXBG0hMt9Kcb2Le8/ut/LGrdCZFJmAavqX9r0dtRVbJJdZVietCSdhcJWMnlcBuQW/ZRE+cOTwrAjkMK/V01S6CBI7JPat3M5lEjcAD6UJE= eltex-pg1-v6@eltex-2026-autumn
+# stat -c '%A (%a) %n' ~/.ssh/authorized_keys
+-rw------- (600) /root/.ssh/authorized_keys
+
+4)Создание user1
+# useradd -m -s /bin/bash user1
+# passwd user1
+passwd: password updated successfully
+# id user1
+uid=1001(user1) gid=1001(user1) groups=1001(user1)
+# getent passwd user1
+user1:x:1001:1001::/home/user1:/bin/bash
+# ls -ld /home/user1
+drwxr-x--- 2 user1 user1 4096 Oct 15 21:43 /home/user1
+
+5) Создание user2 и user3
+# adduser user2
+# adduser user3
+# id user2
+uid=1002(user2) gid=1002(user2) groups=1002(user2),100(users)
+# id user3
+uid=1003(user3) gid=1003(user3) groups=1003(user3),100(users)
+
+6) Изменение user3
+# usermod -s /usr/sbin/nologin user3
+# getent passwd user3
+user3:x:1003:1003:,,,:/home/user3:/usr/sbin/nologin
+# su - user3
+This account is currently not available.
+# su -s /bin/bash - user3
+$ whoami
+user3
+$ exit
+logout
+
+7) Создание группы
+# groupadd sharedgroup
+# usermod -aG sharedgroup user1
+# usermod -aG sharedgroup user2
+# usermod -aG sharedgroup user3
+# id user1
+uid=1001(user1) gid=1001(user1) groups=1001(user1),1004(sharedgroup)
+# id user2
+uid=1002(user2) gid=1002(user2) groups=1002(user2),100(users),1004(sharedgroup)
+# id user3
+uid=1003(user3) gid=1003(user3) groups=1003(user3),100(users),1004(sharedgroup)
+
+9) Создание каталога /opt/share
+# mkdir -p /opt/share
+# chown root:sharedgroup /opt/share
+# chmod 2770 /opt/share
+# ls -ld /opt/share
+drwxrws--- 2 root sharedgroup 4096 Oct 15 22:35 /opt/share
+# stat -c '%A %a %U:%G %n' /opt/share
+drwxrws--- 2770 root:sharedgroup /opt/share
+
+10) umask для user1
+# echo 'umask 004' >> /home/user1/.profile
+# su - user1
+$ umask
+0004
+
+11) Создание файлов
+# su - user1 -c 'touch /opt/share/user1.txt'
+# su - user2 -c 'touch /opt/share/user2.txt'
+# su - user3 -c 'touch /opt/share/user3.txt'
+This account is currently not available.
+# su -s /bin/bash -c 'touch /opt/share/user3.txt' user3
+# ls -l /opt/share
+total 0
+-rw-rw--w- 1 user1 sharedgroup 0 Oct 15 23:44 user1.txt
+-rw-rw-r-- 1 user2 sharedgroup 0 Oct 15 23:45 user2.txt
+-rw-rw-r-- 1 user3 sharedgroup 0 Oct 15 23:45 user3.txt
+# su - user2 -c 'rm /opt/share/user1.txt'
+# su -s /bin/bash -c 'rm /opt/share/user2.txt' user3
+# su - user1 -c 'rm /opt/share/user3.txt'
+# ls -la /opt/share
+total 8
+drwxrws--- 2 root sharedgroup 4096 Oct 15 23:47 .
+drwxr-xr-x 3 root root        4096 Oct 15 22:35 ..
+
+12) Создание файлов с установленным sticky bit
+#chmod 3770 /opt/share
+#ls -ld /opt/share
+drwxrws--T 2 root sharedgroup 4096 Oct 19 05:35 /opt/share
+# su - user1 -c 'touch /opt/share/user1.txt'
+# su - user2 -c 'touch /opt/share/user2.txt'
+# su -s /bin/bash -c 'touch /opt/share/user3.txt' user3
+# ls -l /opt/share
+total 0
+-rw-rw--w- 1 user1 sharedgroup 0 Oct 19 05:35 user1.txt
+-rw-rw-r-- 1 user2 sharedgroup 0 Oct 19 05:35 user2.txt
+-rw-rw-r-- 1 user3 sharedgroup 0 Oct 19 05:35 user3.txt
+# su - user2 -c 'rm /opt/share/user1.txt'
+rm: cannot remove '/opt/share/user1.txt': Operation not permitted
+# su -s /bin/bash -c 'rm /opt/share/user2.txt' user3
+rm: cannot remove '/opt/share/user2.txt': Operation not permitted
+# su - user1 -c 'rm /opt/share/user3.txt'
+rm: cannot remove '/opt/share/user3.txt': Operation not permitted
+# ls -l /opt/share
+total 0
+-rw-rw--w- 1 user1 sharedgroup 0 Oct 19 05:35 user1.txt
+-rw-rw-r-- 1 user2 sharedgroup 0 Oct 19 05:35 user2.txt
+-rw-rw-r-- 1 user3 sharedgroup 0 Oct 19 05:35 user3.txt
+
+13) Привилегированная команда dmesg
+# visudo -f /etc/sudoers.d/user1-dmesg
+user1 ALL=(root) NOPASSWD: /usr/bin/dmesg
+# chmod 0440 /etc/sudoers.d/user1-dmesg
+# visudo -c
+/etc/sudoers: parsed OK
+/etc/sudoers.d/README: parsed OK
+/etc/sudoers.d/user1-dmesg: parsed OK
+-r--r----- 1 root root 42 Oct 19 06:08 /etc/sudoers.d/user1-dmesg
+# su - user1 -c 'sudo /usr/bin/dmesg | head -n 3'
+[    0.000000] Linux version 6.8.0-147-generic (buildd@lcy02-amd64-081) (x86_64-linux-gnu-gcc-13 (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #147-Ubuntu SMP PREEMPT_DYNAMIC Thu Sep 24 11:33:16 UTC 2026 (Ubuntu 6.8.0-147.147-generic 6.8.12)
+[    0.000000] Command line: BOOT_IMAGE=/vmlinuz-6.8.0-147-generic root=/dev/mapper/ubuntu--vg-ubuntu--lv ro
+[    0.000000] KERNEL supported cpus:
+
+# cat > /usr/local/bin/dmesg-user2.sh
+#!/bin/bash
+/usr/bin/dmesg
+# chown root:root /usr/local/bin/dmesg-user2.sh
+# chmod 4755 /usr/local/bin/dmesg-user2.sh
+-rwsr-xr-x 1 root root 27 Oct 19 06:23 /usr/local/bin/dmesg-user2.sh
+
+# su - user2 -c '/usr/local/bin/dmesg-user2.sh 2>&1 | head -n 3'
+dmesg: read kernel buffer failed: Operation not permitted
+
+Результат: sudo для user1 работает. Попытка запуска dmesg через Bash-скрипт с SUID для user2 не сработала: Operation not permitted. Linux не применяет SUID к интерпретируемым скриптам, поэтому скрипт не получает привилегии root.
+
+14) Установка срока действия пароля
+# chage -M 10 user1
+# chage -M 10 user2
+# chage -M 10 user3
+
+# chage -l user1
+Last password change					: Oct 15, 2026
+Password expires					: Oct 25, 2026
+Password inactive					: never
+Account expires						: never
+Minimum number of days between password change		: 0
+Maximum number of days between password change		: 10
+Number of days of warning before password expires	: 7
+
+# chage -l user2
+Last password change					: Oct 15, 2026
+Password expires					: Oct 25, 2026
+Password inactive					: never
+Account expires						: never
+Minimum number of days between password change		: 0
+Maximum number of days between password change		: 10
+Number of days of warning before password expires	: 7
+
+# chage -l user3
+Last password change					: Oct 15, 2026
+Password expires					: Oct 25, 2026
+Password inactive					: never
+Account expires						: never
+Minimum number of days between password change		: 0
+Maximum number of days between password change		: 10
+Number of days of warning before password expires	: 7
+
+15) Файл /etc/motd
+# echo 'Дмитрий Батунин' > /etc/motd
+# cat /etc/motd
+Дмитрий Батунин
+
+16) Копирование содержимого /etc
+# rsync -av /etc/ /root/etc_backup/
+# ls -ld /root/etc_backup
+drwxr-xr-x 109 root root 4096 Oct 19 06:58 /root/etc_backup
+# ls /root/etc_backup | head
+adduser.conf
+alternatives
+apparmor
+apparmor.d
+apport
+apt
+bash.bashrc
+bash_completion
+bash_completion.d
+bindresvport.blacklist
+
+17) Создание архивов
+# tar -czf /root/etc_backup.tar.gz -C /root etc_backup
+# tar -cjf /root/etc_backup.tar.bz2 -C /root etc_backup
+# cd /root && 7z a -t7z /root/etc_backup.7z etc_backup
+# ls -lh /root/etc_backup.tar.gz /root/etc_backup.tar.bz2 /root/etc_backup.7z
+-rw-r--r-- 1 root root 4.5M Oct 19 07:30 /root/etc_backup.7z
+-rw-r--r-- 1 root root 526K Oct 19 07:29 /root/etc_backup.tar.bz2
+-rw-r--r-- 1 root root 564K Oct 19 07:25 /root/etc_backup.tar.gz
+
+18) Обновление motd
+# date '+%Y-%m-%d %H:%M:%S' >> /etc/motd
+# cat /etc/motd
+Дмитрий Батунин
+2026-10-19 07:54:25
+# rsync -av /etc/ /root/etc_backup/
+Результат: файл motd синхронизирован с резервной копией.
+# tar -czf /root/etc_backup.tar.gz -C /root etc_backup
+# tar -tzf /root/etc_backup.tar.gz | grep 'etc_backup/motd'
+etc_backup/motd
+
+19) Проверка содержимого bzip2-архива
+#tar -djf /root/etc_backup.tar.bz2 -C /root
+etc_backup/motd: Mod time differs
+etc_backup/motd: Size differs
+Результат: Несовпадение возникли только в файле motd, так как он был изменён после создания bzip2-архива.
+
+20) Распаковка архивов и сравнение motd
+# tar -xzf /root/etc_backup.tar.gz -C /root/etc_backup_gzip
+# 7z x /root/etc_backup.7z -o/root/etc_backup_7zip
+# diff -u /root/etc_backup_gzip/etc_backup/motd /root/etc_backup_7zip/etc_backup/motd
+--- /root/etc_backup_gzip/etc_backup/motd	2026-10-19 07:54:25.000000000 +0000
++++ /root/etc_backup_7zip/etc_backup/motd	2026-10-19 06:58:05.487869400 +0000
+@@ -1,2 +1 @@
+ Дмитрий Батунин
+-2026-10-19 07:54:25
+Результат: в gzip-архиве файл motd содержит имя и дату, а в 7zip-архиве — только имя

@@ -1,0 +1,164 @@
+2) Настройка параметров Git
+
+# git config --global user.name "Dmitriy-X-r"
+# git config --global user.email "batunin.diman2003@gmail.com"
+# git config --global init.defaultBranch main
+# git config --global --list
+
+user.name=Dmitriy-X-r
+user.email=batunin.diman2003@gmail.com
+init.defaultbranch=main
+
+3) Установка git и gh
+
+# apt update
+# apt install git gh
+
+Результат: успешная установка
+
+4) Создание SSH-ключа для GitHub
+
+# ssh-keygen -t ed25519 -f /root/.ssh/Dmitriy-X-r
+# ls -l /root/.ssh/Dmitriy-X-r*
+-rw------- 1 root root 464 Oct 19 20:20 /root/.ssh/Dmitriy-X-r
+-rw-r--r-- 1 root root 109 Oct 19 20:20 /root/.ssh/Dmitriy-X-r.pub
+
+5) Подключение сервера к git
+
+# gh auth login
+github.com
+  ✓ Logged in to github.com account Dmitriy-X-r (/root/.config/gh/hosts.yml)
+  - Active account: true
+  - Git operations protocol: ssh
+  - Token: gho_************************************
+  - Token scopes: 'admin:public_key', 'gist', 'read:org', 'repo'
+
+6) Настройка автоматической авторизации
+
+# gh auth setup-git --hostname github.com
+
+7) Проверка авторизации
+
+# gh auth status
+github.com
+  ✓ Logged in to github.com account Dmitriy-X-r (/root/.config/gh/hosts.yml)
+  - Active account: true
+  - Git operations protocol: ssh
+  - Token: gho_************************************
+  - Token scopes: 'admin:public_key', 'gist', 'read:org', 'repo'
+
+8) Проверка существующего репозитория
+
+# gh repo view Dmitriy-X-r/eltex-linux-course
+name:	Dmitriy-X-r/eltex-linux-course
+description:	
+
+
+9) Настройка ssh-доступа к git и клонирование существующего репозитория
+
+# cat /root/.ssh/config
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile /root/.ssh/Dmitriy-X-r
+    IdentitiesOnly yes
+
+# eval "$(ssh-agent -s)"
+Agent pid 11466
+
+# ssh-add /root/.ssh/Dmitriy-X-r
+Enter passphrase for /root/.ssh/Dmitriy-X-r:
+Identity added: /root/.ssh/Dmitriy-X-r (root@eltex-practice2-pg1-v6)
+
+# ssh-add -l
+256 SHA256:EdE4htgtMlRUPJYLUeKr+9qXC1U35Cf5swJsKhmdQnI root@eltex-practice2-pg1-v6 (ED25519)
+
+# ssh -T git@github.com
+Hi Dmitriy-X-r! You've successfully authenticated, but GitHub does not provide shell access.
+
+# mkdir -p /root/eltex-linux-course
+# cd /root/eltex-linux-course
+# git clone git@github.com:Dmitriy-X-r/eltex-linux-course.git .
+Cloning into '.'...
+remote: Enumerating objects: 14, done.
+remote: Counting objects: 100% (14/14), done.
+remote: Compressing objects: 100% (9/9), done.
+remote: Total 14 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+Receiving objects: 100% (14/14), 564.73 KiB | 1.37 MiB/s, done.
+
+# git status
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+
+# git remote -v
+origin  git@github.com:Dmitriy-X-r/eltex-linux-course.git (fetch)
+origin  git@github.com:Dmitriy-X-r/eltex-linux-course.git (push)
+
+# ls -la
+total 16
+drwxr-xr-x  4 root root 4096 Oct 19 21:27 .
+drwx------ 10 root root 4096 Oct 19 20:54 ..
+drwxr-xr-x  8 root root 4096 Oct 19 21:28 .git
+drwxr-xr-x  3 root root 4096 Oct 19 21:27 Module1
+
+10) Клонирование репозитория
+
+# git clone git@github.com:Dmitriy-X-r/eltex-linux-course.git /root/eltex-linux-course-clone
+
+Клон создан в каталоге /root/eltex-linux-course-clone.
+
+11) Синхронизация репозитория
+
+# cd /root/eltex-linux-course
+# echo "# Практика 2" > Module1/Practice2/README.md
+# echo >> Module1/Practice2/README.md
+# echo "тут находятся лог файлы по всем трем разделам второй практики." >> Module1/Practice2/README.md
+# git add Module1/Practice2/README.md
+# git commit -m "update Practice2 README"
+# git push origin main
+
+# cd /root/eltex-linux-course-clone
+# git fetch
+# git log origin/main --oneline -5
+4878b59 (origin/main, origin/HEAD) update Practice2 README
+d6da2b4 (HEAD -> main) add Practice2 report directory
+af6b2fb Add files via upload
+ddfa270 Create README.md
+
+# git diff main origin/main
+diff --git a/Module1/Practice2/README.md b/Module1/Practice2/README.md
+index dcaef6c..9906db7 100644
+--- a/Module1/Practice2/README.md
++++ b/Module1/Practice2/README.md
+@@ -1 +1,3 @@
+ # Практика 2
++
++тут находятся лог файлы по всем трем разделам второй практики.
+
+# git merge origin/main
+Updating d6da2b4..4878b59
+Fast-forward
+ Module1/Practice2/README.md | 2 ++
+ 1 file changed, 2 insertions(+)
+
+# git status
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+
+12) Размещение отчётов по практике 2 в git
+
+$ scp ~/practice2_eltex-pg1-v6_part1.log ~/practice2_eltex-pg1-v6_part2.log ~/practice2_eltex-pg1-v6_part3.log root@172.16.9.180:/root/eltex-linux-course/Module1/Practice2/
+$ ssh root@172.16.9.180
+
+# cd /root/eltex-linux-course
+# tree -L 2 Module1/Practice2
+# git status
+# git add Module1/Practice2/practice2_eltex-pg1-v6_part1.log Module1/Practice2/practice2_eltex-pg1-v6_part2.log Module1/Practice2/practice2_eltex-pg1-v6_part3.log
+# git commit -m "add Practice2 logs"
+# git push origin main
+# git status
+# git log -1 --oneline

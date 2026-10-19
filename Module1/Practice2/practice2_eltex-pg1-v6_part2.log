@@ -1,0 +1,267 @@
+1) Записи из лога загрузки за первые 20 секунд от первой записи загрузки
+# boot_start=$(journalctl -b --no-pager -o short-iso | head -n 1 | awk '{print $1}')
+# boot_start_epoch=$(date -d "$boot_start" +%s)
+# boot_end_epoch=$((boot_start_epoch + 20))
+# boot_start_display=$(date -d "@$boot_start_epoch" "+%Y-%m-%d %H:%M:%S")
+# boot_end_display=$(date -d "@$boot_end_epoch" "+%Y-%m-%d %H:%M:%S")
+# echo "Первая запись журнала: $boot_start_display"
+Первая запись журнала: 2026-10-18 17:16:59
+# echo "Конец интервала: $boot_end_display"
+Конец интервала: 2026-10-18 17:17:19
+# journalctl -b --since="@$boot_start_epoch" --until="@$boot_end_epoch" --no-pager | head -n 10
+# journalctl -b --since="@$boot_start_epoch" --until="@$boot_end_epoch" --no-pager | tail -n 10
+
+Oct 18 17:16:59 localhost kernel: Linux version 6.8.0-147-generic (buildd@lcy02-amd64-081) (x86_64-linux-gnu-gcc-13 (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #147-Ubuntu SMP PREEMPT_DYNAMIC Thu Sep 24 11:33:16 UTC 2026 (Ubuntu 6.8.0-147.147-generic 6.8.12)
+Oct 18 17:16:59 localhost kernel: Command line: BOOT_IMAGE=/vmlinuz-6.8.0-147-generic root=/dev/mapper/ubuntu--vg-ubuntu--lv ro
+Oct 18 17:16:59 localhost kernel: KERNEL supported cpus:
+Oct 18 17:16:59 localhost kernel:   Intel GenuineIntel
+Oct 18 17:16:59 localhost kernel:   AMD AuthenticAMD
+Oct 18 17:16:59 localhost kernel:   Hygon HygonGenuine
+Oct 18 17:16:59 localhost kernel:   Centaur CentaurHauls
+Oct 18 17:16:59 localhost kernel:   zhaoxin   Shanghai  
+Oct 18 17:16:59 localhost kernel: BIOS-provided physical RAM map:
+Oct 18 17:16:59 localhost kernel: BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
+.....
+Oct 18 17:17:18 localhost systemd[1]: Starting udisks2.service - Disk Manager...
+Oct 18 17:17:18 localhost dbus-daemon[680]: dbus[680]: Unknown group "power" in message bus configuration file
+Oct 18 17:17:18 localhost systemd[1]: e2scrub_reap.service: Deactivated successfully.
+Oct 18 17:17:18 localhost systemd[1]: Finished e2scrub_reap.service - Remove Stale Online ext4 Metadata Check Snapshots.
+Oct 18 17:17:18 localhost systemd[1]: Finished systemd-user-sessions.service - Permit User Sessions.
+Oct 18 17:17:18 localhost systemd[1]: Starting plymouth-quit-wait.service - Hold until boot process finishes up...
+Oct 18 17:17:18 localhost systemd[1]: Starting plymouth-quit.service - Terminate Plymouth Boot Screen...
+Oct 18 17:17:18 localhost systemd[1]: Finished plymouth-quit-wait.service - Hold until boot process finishes up.
+Oct 18 17:17:18 localhost systemd[1]: Starting setvtrgb.service - Set console scheme...
+Oct 18 17:17:18 localhost systemd[1]: Finished plymouth-quit.service - Terminate Plymouth Boot Screen.
+
+2) Поиск источников и сообщений в auth.log
+
+# find / -type f -name auth.log
+/var/log/auth.log
+
+Команда обработки файла:
+# awk '{
+    source = $3
+    sub(/:$/, "", source)
+    message = ""
+    for (i = 4; i <= NF; i++) {
+        message = message (i == 4 ? "" : " ") $i
+    }
+    print source, message
+}' /var/log/auth.log |
+sed -E 's/\[[0-9]+\]//' |
+sort -k1,1 -k2,2 |
+awk '{
+    source = $1
+    $1 = ""
+    sub(/^ /, "")
+    if (source != previous) {
+        if (NR > 1) print ""
+        print source
+        previous = source
+    }
+    print "  " $0
+}'
+
+Примечание: Я специально вынес все заголовки и скрыл большую часть однотипных записей, чтобы этот вывод был более менее читаемый
+
+chage
+  changed password expiry for user1
+  changed password expiry for user2
+  changed password expiry for user3
+
+CRON
+  pam_unix(cron:session): session closed for user root
+  pam_unix(cron:session): session closed for user root
+  ...
+  pam_unix(cron:session): session opened for user root(uid=0) by root(uid=0)
+  pam_unix(cron:session): session opened for user root(uid=0) by root(uid=0)
+  ...
+
+dbus-daemon
+  [system] Failed to activate service 'org.freedesktop.fwupd': timed out (service_start_timeout=25000ms)
+  pam_unix(cron:session): session closed for user root
+  pam_unix(cron:session): session closed for user root
+  ...
+
+dbus-daemon
+  [system] Failed to activate service 'org.freedesktop.fwupd': timed out (service_start_timeout=25000ms)
+
+polkitd
+  Acquired the name org.freedesktop.PolicyKit1 on the system bus
+  Acquired the name org.freedesktop.PolicyKit1 on the system bus
+  Finished loading, compiling and executing 6 rules
+  Finished loading, compiling and executing 6 rules
+  Loading rules from directory /etc/polkit-1/rules.d
+  Loading rules from directory /etc/polkit-1/rules.d
+  ...
+
+(sd-pam)
+  pam_unix(systemd-user:session): session closed for user root
+  pam_unix(systemd-user:session): session closed for user root
+  ...
+
+sshd
+  Accepted publickey for root from 172.16.8.4 port 32826 ssh2: RSA SHA256:prEhOqLyi3pk7QpkyORAOlegXzXT+8nlw8racP8hwPE
+  Accepted publickey for root from 172.16.8.4 port 32836 ssh2: RSA SHA256:prEhOqLyi3pk7QpkyORAOlegXzXT+8nlw8racP8hwPE
+  ...
+  Disconnected from user root 172.16.8.4 port 32826
+  Disconnected from user root 172.16.8.4 port 32836
+  ...
+  pam_unix(sshd:session): session closed for user root
+  pam_unix(sshd:session): session closed for user root
+  ...
+  Received disconnect from 172.16.8.4 port 32826:11: disconnected by user
+  Received disconnect from 172.16.8.4 port 32836:11: disconnected by user
+  ...
+  Server listening on 0.0.0.0 port 22.
+  Server listening on :: port 22.
+
+su
+  pam_unix(su-l:session): session closed for user user1
+  pam_unix(su-l:session): session closed for user user1
+  ...
+  (to user1) root on none
+  (to user1) root on pts/0
+  ...
+
+sudo
+  pam_unix(sudo:session): session closed for user root
+  pam_unix(sudo:session): session closed for user root
+  ...
+
+(systemd)
+  pam_unix(systemd-user:session): session opened for user root(uid=0) by root(uid=0)
+  pam_unix(systemd-user:session): session opened for user root(uid=0) by root(uid=0)
+  ...
+
+systemd-logind
+  Creating /run/nologin, blocking further logins...
+  New seat seat0.
+  New seat seat0.
+  New session 100 of user root.
+  ...
+
+3) Подсчёт количества записей для каждого источника
+
+# awk '{ source = $3; sub(/:$/, "", source); print source }' /var/log/auth.log |
+sed -E 's/\[[0-9]+\]//' |
+sort |
+uniq -c |
+sort -nr |
+awk '{print $1, $2}'
+
+368 CRON
+224 sshd
+141 systemd-logind
+36 su
+34 (systemd)
+8 polkitd
+6 sudo
+5 (sd-pam)
+3 chage
+1 dbus-daemon
+
+4) Поиск пользователей с оболочкой /usr/sbin/nologin
+
+# awk -F: '
+NR == FNR {
+    group_name[$3] = $1
+
+    if ($4 != "") {
+        n = split($4, members, ",")
+        for (i = 1; i <= n; i++) {
+            in_group[members[i], $1] = 1
+        }
+    }
+    next
+}
+$7 == "/usr/sbin/nologin" {
+    uid = $3
+    username = $1
+    groups = ""
+
+    for (gid in group_name) {
+        if (gid == $4 || in_group[username, group_name[gid]]) {
+            groups = groups (groups == "" ? "" : ",") group_name[gid]
+        }
+    }
+
+    print uid, username, groups
+}' /etc/group /etc/passwd | sort -k1,1nr
+
+65534 nobody nogroup
+1003 user3 users,user3,sharedgroup
+998 systemd-network systemd-network
+997 systemd-timesync systemd-timesync
+992 systemd-resolve systemd-resolve
+991 polkitd polkitd
+989 fwupd-refresh fwupd-refresh
+109 sshd nogroup
+108 usbmux plugdev
+107 landscape landscape
+105 tcpdump tcpdump
+104 uuidd uuidd
+103 syslog adm,syslog
+101 messagebus messagebus
+42 _apt nogroup
+39 irc irc
+38 list list
+34 backup backup
+33 www-data www-data
+13 proxy proxy
+10 uucp uucp
+9 news news
+8 mail mail
+7 lp lp
+6 man man
+5 games games
+3 sys sys
+2 bin bin
+1 daemon daemon
+
+5) Поиск строк dmesg, которые содержат kernel
+# dmesg | grep -w kernel
+
+[    0.093156] Booting paravirtualized kernel on KVM
+[    0.192689] Memory: 3925848K/4193760K available (22528K kernel code, 4441K rwdata, 14440K rodata, 4936K init, 4772K bss, 267652K reserved, 0K cma-reserved)
+[    0.641742] Loaded X.509 cert 'Build time autogenerated kernel key: 67dae3bf0284ce2ad34b9632cb7c8734f4f57c6c'
+[    0.846406] Loaded X.509 cert 'Build time autogenerated kernel key: 67dae3bf0284ce2ad34b9632cb7c8734f4f57c6c'
+[    0.876845] Freeing unused kernel image (initmem) memory: 4936K
+[    0.878376] Write protecting the kernel read-only data: 38912k
+[    0.881323] Freeing unused kernel image (rodata/data gap) memory: 1944K
+[   28.931192] systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
+[   28.994383] systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+[   28.996052] systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+[   29.483723] systemd[1]: Mounted sys-kernel-debug.mount - Kernel Debug File System.
+[   29.484850] systemd[1]: Mounted sys-kernel-tracing.mount - Kernel Trace File System.
+[   29.503807] systemd[1]: Mounting sys-kernel-config.mount - Kernel Configuration File System...
+[   29.529063] systemd[1]: Mounted sys-kernel-config.mount - Kernel Configuration File System.
+
+6) Подсчёт количества строк в /var/log/kern.log
+# wc -l /var/log/kern.log
+
+1367 /var/log/kern.log
+
+7) Форматирование записей из /var/log/apt/history.log (первые 10 записей, чтобы не выводить сотни строк)
+
+# awk '
+/^Start-Date:/ {
+    start = $0
+}
+/^Commandline:/ {
+    command = $0
+}
+/^End-Date:/ {
+    print command " ; " start " ; " $0
+}' /var/log/apt/history.log | head -n 10
+
+Commandline: apt-get install --reinstall apt ; Start-Date: 2025-02-16  20:51:22 ; End-Date: 2025-02-16  20:51:24
+Commandline: apt-get install --reinstall base-files ; Start-Date: 2025-02-16  20:51:26 ; End-Date: 2025-02-16  20:51:28
+Commandline: apt-get install --reinstall base-passwd ; Start-Date: 2025-02-16  20:51:31 ; End-Date: 2025-02-16  20:51:32
+Commandline: apt-get install --reinstall bash ; Start-Date: 2025-02-16  20:51:35 ; End-Date: 2025-02-16  20:51:37
+Commandline: apt-get install --reinstall bsdutils ; Start-Date: 2025-02-16  20:51:39 ; End-Date: 2025-02-16  20:51:41
+Commandline: apt-get install --reinstall coreutils ; Start-Date: 2025-02-16  20:51:44 ; End-Date: 2025-02-16  20:51:45
+Commandline: apt-get install --reinstall dash ; Start-Date: 2025-02-16  20:51:48 ; End-Date: 2025-02-16  20:51:49
+Commandline: apt-get install --reinstall debconf ; Start-Date: 2025-02-16  20:51:52 ; End-Date: 2025-02-16  20:51:53
+Commandline: apt-get install --reinstall debianutils ; Start-Date: 2025-02-16  20:51:56 ; End-Date: 2025-02-16  20:51:58
+Commandline: apt-get install --reinstall diffutils ; Start-Date: 2025-02-16  20:52:00 ; End-Date: 2025-02-16  20:52:02
