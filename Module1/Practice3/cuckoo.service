@@ -1,0 +1,12 @@
+[Unit]
+Description=Cuckoo time request service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/root/task3_part2/cuckoo.sh --pishitesuda=/root/task3_part2/cuckoo.fifo
+WorkingDirectory=/root/task3_part2
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
