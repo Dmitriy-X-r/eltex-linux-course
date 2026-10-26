@@ -20,9 +20,9 @@ typedef struct Contact {
     int email_count;
 } Contact;
 
-void add_contact(Contact contacts[], int *contact_count);
+int add_contact(Contact contacts[], int *contact_count);
 void show_contacts(const Contact contacts[], int contact_count);
-void edit_contact(Contact contacts[], int contact_count);
-void delete_contact(Contact contacts[], int *contact_count);
+int edit_contact(Contact contacts[], int contact_count);
+int delete_contact(Contact contacts[], int *contact_count);
 
 #endif

@@ -82,10 +82,10 @@ static void read_contact_data(Contact *contact) {
     }
 }
 
-void add_contact(Contact contacts[], int *contact_count) {
+int add_contact(Contact contacts[], int *contact_count) {
     if(*contact_count >= MAX_CONTACTS) {
         printf("Телефонная книга заполнена.\n");
-        return;
+        return 0;
     }
 
     Contact new_contact = {0};
@@ -95,7 +95,7 @@ void add_contact(Contact contacts[], int *contact_count) {
     contacts[*contact_count] = new_contact;
     (*contact_count)++;
 
-    printf("Контакт успешно добавлен\n");
+    return 1;
 }
 
 void show_contacts(const Contact contacts[], int contact_count) {
@@ -124,18 +124,19 @@ void show_contacts(const Contact contacts[], int contact_count) {
     }
 }
 
-void edit_contact(Contact contacts[], int contact_count) {
+int edit_contact(Contact contacts[], int contact_count) {
     if(contact_count == 0) {
         printf("Нет контактов для редактирования\n");
-        return;
+        return 0;
     }
 
     show_contacts(contacts, contact_count);
 
     int index = read_number("\nВведите номер контакта для редактирования:");
+
     if(index < 1 || index > contact_count) {
         printf("Неверный номер контакта\n");
-        return;
+        return 0;
     }
 
     Contact updated_contact = {0};
@@ -145,13 +146,13 @@ void edit_contact(Contact contacts[], int contact_count) {
 
     contacts[index-1] = updated_contact;
 
-    printf("Контакт успешно изменён\n");
+    return 1;
 }
 
-void delete_contact(Contact contacts[], int *contact_count) {
+int delete_contact(Contact contacts[], int *contact_count) {
     if (*contact_count == 0) {
         printf("Нет контактов для удаления\n");
-        return;
+        return 0;
     }
 
     show_contacts(contacts, *contact_count);
@@ -159,13 +160,14 @@ void delete_contact(Contact contacts[], int *contact_count) {
 
     if (index < 1 || index > *contact_count) {
         printf("Неверный номер контакта\n");
-        return;
+        return 0;
     }
 
     for(int i = index-1; i < *contact_count - 1; i++) {
         contacts[i] = contacts[i+1];
     }
+    
     (*contact_count)--;
 
-    printf("Контакт успешно удалён\n");
+    return 1;
 }

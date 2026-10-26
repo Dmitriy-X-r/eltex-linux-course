@@ -29,7 +29,9 @@ int main(void)
 
         switch (choice) {
             case 1:
-                add_contact(contacts, &contact_count);
+                if (add_contact(contacts, &contact_count)) {
+                    printf("Контакт успешно добавлен\n");
+                }
                 break;
 
             case 2:
@@ -37,11 +39,15 @@ int main(void)
                 break;
 
             case 3:
-                edit_contact(contacts, contact_count);
+                if (edit_contact(contacts, contact_count)) {
+                    printf("Контакт успешно изменён\n");
+                }
                 break;
 
             case 4:
-                delete_contact(contacts, &contact_count);
+                if (delete_contact(contacts, &contact_count)) {
+                    printf("Контакт успешно удалён\n");
+                }
                 break;
 
             case 0:
