@@ -46,9 +46,23 @@ static int read_number(const char *prompt, long *number) {
     }
 }
 
+static int read_required_text(const char *prompt, char *buffer, size_t size) {
+    while (1) {
+        if (!read_text(prompt, buffer, size)) {
+            return 0;
+        }
+
+        if (buffer[0] != '\0') {
+            return 1;
+        }
+
+        printf("Поле обязательно для заполнения.\n");
+    }
+}
+
 static int read_contact_data(Contact *contact) {
-    if (!read_text("Имя: ", contact->first_name, TEXT_LENGTH) ||
-        !read_text("Фамилия: ", contact->last_name, TEXT_LENGTH) ||
+    if (!read_required_text("Имя: ", contact->first_name, sizeof(contact->first_name)) ||
+        !read_required_text("Фамилия: ", contact->last_name, sizeof(contact->last_name)) ||
         !read_text("Отчество: ", contact->patronymic, TEXT_LENGTH) ||
         !read_text("Место работы: ", contact->workplace, TEXT_LENGTH) ||
         !read_text("Должность: ", contact->position, TEXT_LENGTH)) {
@@ -156,6 +170,33 @@ static void show_contacts(const ContactTree *tree) {
     }
 }
 
+static void print_tree_recursive(const ContactNode *node, int depth, const char *branch) {
+    if (node == NULL) {
+        return;
+    }
+
+    print_tree_recursive(node->right, depth + 1, "R");
+
+    printf("%*s%s: %s\n",
+           depth * 4, "",
+           branch,
+           node->contact.last_name);
+
+    print_tree_recursive(node->left, depth + 1, "L");
+}
+
+static void show_tree(const ContactTree *tree) {
+    if (tree->root == NULL) {
+        printf("Дерево пустое.\n");
+        return;
+    }
+
+    printf("\n=== Структура AVL-дерева ===\n");
+
+    print_tree_recursive(tree->root, 0, "#");
+    printf("\n");
+}
+
 static int read_contact_index(const ContactTree *tree, size_t *index) {
     size_t count = phonebook_count(tree);
 
@@ -199,12 +240,12 @@ static int edit_contact_fields(Contact *contact) {
 
     switch (choice) {
         case 1:
-            return read_text("Новое имя: ",
-                             contact->first_name, TEXT_LENGTH);
+            return read_required_text("Новое имя: ",
+                             contact->first_name, sizeof(contact->first_name));
 
         case 2:
-            return read_text("Новая фамилия: ",
-                             contact->last_name, TEXT_LENGTH);
+            return read_required_text("Новая фамилия: ",
+                             contact->last_name, sizeof(contact->last_name));
 
         case 3:
             return read_text("Новое отчество: ",
@@ -296,6 +337,58 @@ static int edit_contact_fields(Contact *contact) {
     }
 }
 
+static void search_contacts_by_prefix(const ContactTree *tree) {
+    char prefix[TEXT_LENGTH];
+
+    if (!read_text("Введите начало фамилии: ",
+                   prefix, sizeof(prefix))) {
+        return;
+    }
+
+    if (prefix[0] == '\0') {
+        printf("Введите хотя бы один символ.\n");
+        return;
+    }
+
+    size_t capacity = phonebook_count(tree);
+
+    if (capacity == 0) {
+        printf("Телефонная книга пуста.\n");
+        return;
+    }
+
+    size_t *indices = malloc(capacity * sizeof(*indices));
+
+    if (indices == NULL) {
+        printf("Не удалось выделить память для поиска.\n");
+        return;
+    }
+
+    size_t found = phonebook_find_by_last_name_prefix(
+        tree, prefix, indices, capacity
+    );
+
+    if (found == 0) {
+        printf("Совпадений не найдено.\n");
+    } else {
+        printf("\nНайденные контакты:\n");
+
+        for (size_t i = 0; i < found; i++) {
+            const Contact *contact =
+                phonebook_get_at(tree, indices[i]);
+
+            if (contact != NULL) {
+                printf("№ %zu — %s, %s\n",
+                       indices[i] + 1,
+                       contact->last_name,
+                       contact->first_name);
+            }
+        }
+    }
+
+    free(indices);
+}
+
 int main(void) {
     ContactTree tree;
     phonebook_init(&tree);
@@ -308,6 +401,8 @@ int main(void) {
         printf("2. Показать контакты\n");
         printf("3. Редактировать контакт\n");
         printf("4. Удалить контакт\n");
+        printf("5. Показать структуру дерева\n");
+        printf("6. Найти контакты по началу фамилии\n");
         printf("0. Выход\n");
 
         long choice;
@@ -401,6 +496,14 @@ int main(void) {
 
                 break;
             }
+
+            case 5:
+                show_tree(&tree);
+                break;
+
+            case 6:
+                search_contacts_by_prefix(&tree);
+                break;
 
             case 0:
                 running = 0;

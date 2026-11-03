@@ -41,6 +41,12 @@ int phonebook_update(ContactTree *tree, size_t index, const Contact *updated_con
 
 const Contact *phonebook_get_at(const ContactTree *tree, size_t index);
 size_t phonebook_count(const ContactTree *tree);
+size_t phonebook_find_by_last_name_prefix(
+    const ContactTree *tree,
+    const char *prefix,
+    size_t *indices,
+    size_t capacity
+);
 
 void phonebook_clear(ContactTree *tree);
 

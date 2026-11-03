@@ -135,7 +135,7 @@ static ContactNode *insert_node(ContactNode *root, ContactNode *node) {
 }
 
 int phonebook_add(ContactTree *tree, const Contact *contact) {
-    if (contact == NULL) {
+    if (contact == NULL || contact->first_name[0] == '\0' || contact->last_name[0] == '\0') {
         return 0;
     }
 
@@ -266,7 +266,7 @@ int phonebook_remove(ContactTree *tree, size_t index) {
 }
 
 int phonebook_update(ContactTree *tree, size_t index, const Contact *updated_contact) {
-    if (updated_contact == NULL || index >= tree->size) {
+    if (updated_contact == NULL || updated_contact->first_name[0] == '\0' ||  updated_contact->last_name[0] == '\0' || index >= tree->size) {
         return 0;
     }
 
@@ -292,6 +292,55 @@ int phonebook_update(ContactTree *tree, size_t index, const Contact *updated_con
     tree->size++;
 
     return 1;
+}
+
+static void find_prefix_recursive(
+    const ContactNode *node,
+    const char *prefix,
+    size_t prefix_length,
+    size_t *position,
+    size_t *indices,
+    size_t capacity,
+    size_t *found
+) {
+    if (node == NULL) {
+        return;
+    }
+
+    find_prefix_recursive(node->left, prefix, prefix_length,
+                          position, indices, capacity, found);
+
+    if (strncmp(node->contact.last_name, prefix,
+                prefix_length) == 0) {
+        if (*found < capacity) {
+            indices[*found] = *position;
+        }
+        (*found)++;
+    }
+
+    (*position)++;
+
+    find_prefix_recursive(node->right, prefix, prefix_length,
+                          position, indices, capacity, found);
+}
+
+size_t phonebook_find_by_last_name_prefix(
+    const ContactTree *tree,
+    const char *prefix,
+    size_t *indices,
+    size_t capacity
+) {
+    if (tree == NULL || prefix == NULL || prefix[0] == '\0') {
+        return 0;
+    }
+
+    size_t position = 0;
+    size_t found = 0;
+
+    find_prefix_recursive(tree->root, prefix, strlen(prefix),
+                          &position, indices, capacity, &found);
+
+    return found;
 }
 
 static void clear_nodes(ContactNode *root) {
