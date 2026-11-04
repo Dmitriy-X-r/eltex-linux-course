@@ -6,4 +6,4 @@
 
 ```bash
 make
-./phonebook
+LD_LIBRARY_PATH=. ./phonebook
