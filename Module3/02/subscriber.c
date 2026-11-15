@@ -215,11 +215,7 @@ int run_subscriber(int topic_count, char *topics[])
 
     printf("\nSubscriber is stopping...\n");
 
-    if (!stop_requested) {
-        unsubscribe_all(queue_id, pid, subscribed_count, topics);
-    } else {
-        unsubscribe_all(queue_id, pid, subscribed_count, topics);
-    }
+    unsubscribe_all(queue_id, pid, subscribed_count, topics);
 
     printf("Subscriber stopped.\n");
 

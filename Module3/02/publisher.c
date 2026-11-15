@@ -93,7 +93,7 @@ int run_publisher(const char *topic)
             int ch;
 
             while ((ch = getchar()) != '\n' && ch != EOF) {
-                /* Discard the remainder of an oversized input line. */
+                
             }
 
             fprintf(stderr, "Message is too long; skipped\n");

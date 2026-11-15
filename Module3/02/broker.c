@@ -107,8 +107,7 @@ static void remove_subscription(
     Subscription **current = head;
 
     while (*current != NULL) {
-        if ((*current)->pid == pid &&
-            strcmp((*current)->topic, topic) == 0) {
+        if ((*current)->pid == pid && strcmp((*current)->topic, topic) == 0) {
             Subscription *removed = *current;
             *current = removed->next;
             free(removed);
