@@ -74,7 +74,7 @@ static int all_blocks_processed(const SharedHeader *shared) {
     return 1;
 }
 
-static int wait_for_consumer(int shmid)
+/*static int wait_for_consumer(int shmid)
 {
     struct shmid_ds info;
 
@@ -93,7 +93,7 @@ static int wait_for_consumer(int shmid)
 
         sleep(1);
     }
-}
+}*/
 
 static int wait_for_consumers_to_detach(int shmid)
 {
@@ -124,10 +124,10 @@ int producer_run(void) {
         return 1;
     }
 
-    if (wait_for_consumer(shmid) == -1) {
+   /* if (wait_for_consumer(shmid) == -1) {
         destroy_shared_resources(shmid, semid, shared);
         return 1;
-    }
+    }*/
 
     srand((unsigned int)(time(NULL) ^ getpid()));
 
