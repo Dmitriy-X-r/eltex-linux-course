@@ -1,6 +1,5 @@
 #include "chat.h"
 
-int main(void)
-{
+int main(void) {
     return run_server();
 }

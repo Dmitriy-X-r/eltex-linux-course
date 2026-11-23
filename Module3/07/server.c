@@ -37,14 +37,12 @@ static volatile sig_atomic_t stop_requested = 0;
 static int epoll_fd = -1;
 static Client *clients = NULL;
 
-static void handle_sigint(int signal_number)
-{
+static void handle_sigint(int signal_number) {
     (void)signal_number;
     stop_requested = 1;
 }
 
-static int set_nonblocking(int fd)
-{
+static int set_nonblocking(int fd) {
     int flags = fcntl(fd, F_GETFL, 0);
 
     if (flags == -1) {
@@ -54,8 +52,7 @@ static int set_nonblocking(int fd)
     return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
 
-static Client *find_client(int fd)
-{
+static Client *find_client(int fd) {
     for (Client *client = clients;
          client != NULL;
          client = client->next) {
@@ -67,8 +64,7 @@ static Client *find_client(int fd)
     return NULL;
 }
 
-static int update_client_events(Client *client)
-{
+static int update_client_events(Client *client) {
     struct epoll_event event = {0};
 
     event.events = EPOLLIN | EPOLLRDHUP;
@@ -83,9 +79,7 @@ static int update_client_events(Client *client)
                      client->fd, &event);
 }
 
-static int queue_message(Client *client,
-                         const ChatMessage *message)
-{
+static int queue_message(Client *client, const ChatMessage *message) {
     if (client->queue_count == OUTPUT_QUEUE_SIZE) {
         fprintf(stderr,
                 "Очередь сообщений клиента %s переполнена.\n",
@@ -107,9 +101,7 @@ static int queue_message(Client *client,
     return 0;
 }
 
-static void broadcast_message(const ChatMessage *message,
-                              int excluded_fd)
-{
+static void broadcast_message(const ChatMessage *message, int excluded_fd) {
     for (Client *client = clients;
          client != NULL;
          client = client->next) {
@@ -122,8 +114,7 @@ static void broadcast_message(const ChatMessage *message,
     }
 }
 
-static void remove_client(Client *client, int announce)
-{
+static void remove_client(Client *client, int announce) {
     if (announce && client->joined) {
         ChatMessage message = {0};
 
@@ -156,8 +147,7 @@ static void remove_client(Client *client, int announce)
     free(client);
 }
 
-static int flush_client(Client *client)
-{
+static int flush_client(Client *client) {
     while (client->queue_count > 0) {
         ChatMessage *message =
             &client->output_queue[client->queue_head];
@@ -202,9 +192,7 @@ static int flush_client(Client *client)
     return 0;
 }
 
-static int process_message(Client *client,
-                           const ChatMessage *message)
-{
+static int process_message(Client *client, const ChatMessage *message) {
     uint32_t type = ntohl(message->type);
 
     if (type == CHAT_MESSAGE_JOIN) {
@@ -223,12 +211,21 @@ static int process_message(Client *client,
                client->hostname);
 
         broadcast_message(message, client->fd);
-    } else if (type == CHAT_MESSAGE_TEXT) {
+    } else if (type == CHAT_MESSAGE_TEXT ||
+            type == CHAT_MESSAGE_FILE_START ||
+            type == CHAT_MESSAGE_FILE_DATA ||
+            type == CHAT_MESSAGE_FILE_END) {
+        if (type == CHAT_MESSAGE_FILE_DATA &&
+            ntohl(message->data_length) > sizeof(message->text)) {
+            fprintf(stderr, "Получен некорректный размер блока файла.\n");
+            return 1;
+        }
+
         if (client->joined) {
             ChatMessage outgoing = *message;
 
             snprintf(outgoing.hostname, sizeof(outgoing.hostname),
-                     "%s", client->hostname);
+                    "%s", client->hostname);
 
             broadcast_message(&outgoing, client->fd);
         }
@@ -252,11 +249,7 @@ static int process_message(Client *client,
     return 0;
 }
 
-/*
- * Возвращает -1, если клиент отключён или возникла ошибка.
- */
-static int read_client(Client *client)
-{
+static int read_client(Client *client) {
     for (;;) {
         char *destination = (char *)&client->incoming;
         size_t remaining = sizeof(client->incoming)
@@ -285,23 +278,23 @@ static int read_client(Client *client)
         client->received_bytes += (size_t)received;
 
         if (client->received_bytes == sizeof(client->incoming)) {
-            client->incoming.hostname[CHAT_HOSTNAME_LENGTH - 1] = '\0';
-            client->incoming.text[CHAT_TEXT_LENGTH - 1] = '\0';
+            uint32_t type = ntohl(client->incoming.type);
 
-            int should_disconnect =
-                process_message(client, &client->incoming);
+            client->incoming.hostname[CHAT_HOSTNAME_LENGTH - 1] = '\0';
+
+            if (type != CHAT_MESSAGE_FILE_DATA)
+                client->incoming.text[CHAT_TEXT_LENGTH - 1] = '\0';
+
+            int should_disconnect = process_message(client, &client->incoming);
 
             client->received_bytes = 0;
 
-            if (should_disconnect) {
-                return -1;
-            }
+            return should_disconnect ? -1 : 0;
         }
     }
 }
 
-static int accept_clients(int server_fd)
-{
+static int accept_clients(int server_fd) {
     for (;;) {
         int client_fd = accept(server_fd, NULL, NULL);
 
@@ -352,8 +345,7 @@ static int accept_clients(int server_fd)
     }
 }
 
-int run_server(void)
-{
+int run_server(void) {
     int server_fd = -1;
     int result = EXIT_FAILURE;
 

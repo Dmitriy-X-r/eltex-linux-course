@@ -14,39 +14,22 @@
 
 static volatile sig_atomic_t stop_requested = 0;
 
-static void handle_sigint(int signal_number)
-{
+static void handle_sigint(int signal_number) {
     (void)signal_number;
     stop_requested = 1;
 }
 
-static int send_message(int socket_fd,
-                        uint32_t type,
-                        const char *hostname,
-                        const char *text)
-{
-    ChatMessage message = {0};
 
-    message.type = htonl(type);
-
-    snprintf(message.hostname, sizeof(message.hostname),
-             "%s", hostname);
-
-    if (text != NULL) {
-        snprintf(message.text, sizeof(message.text),
-                 "%s", text);
-    }
-
-    const char *data = (const char *)&message;
-    size_t remaining = sizeof(message);
+static int send_packet(int socket_fd, const ChatMessage *message) {
+    const char *data = (const char *)message;
+    size_t remaining = sizeof(*message);
 
     while (remaining > 0) {
         ssize_t sent = send(socket_fd, data, remaining, MSG_NOSIGNAL);
 
         if (sent == -1) {
-            if (errno == EINTR) {
+            if (errno == EINTR)
                 continue;
-            }
 
             perror("send");
             return -1;
@@ -64,8 +47,86 @@ static int send_message(int socket_fd,
     return 0;
 }
 
-static void print_message(const ChatMessage *message)
+
+
+static int send_message(int socket_fd, uint32_t type, const char *hostname, const char *text) {
+    ChatMessage message = {0};
+
+    message.type = htonl(type);
+    message.data_length = htonl(0);
+
+    snprintf(message.hostname, sizeof(message.hostname),
+             "%s", hostname);
+
+    if (text != NULL) {
+        snprintf(message.text, sizeof(message.text),
+                 "%s", text);
+    }
+
+    return send_packet(socket_fd, &message);
+}
+
+
+static int send_next_file_part(int socket_fd,
+                               FILE **file_to_send,
+                               const char *hostname,
+                               const char *filename,
+                               int *start_pending)
 {
+    ChatMessage message = {0};
+
+    snprintf(message.hostname, sizeof(message.hostname),
+             "%s", hostname);
+
+    if (*start_pending) {
+        message.type = htonl(CHAT_MESSAGE_FILE_START);
+
+        snprintf(message.text, sizeof(message.text),
+                 "%s", filename);
+
+        if (send_packet(socket_fd, &message) == -1)
+            return -1;
+
+        *start_pending = 0;
+        return 0;
+    }
+
+    size_t count = fread(message.text, 1,
+                         sizeof(message.text), *file_to_send);
+
+    if (count > 0) {
+        message.type = htonl(CHAT_MESSAGE_FILE_DATA);
+        message.data_length = htonl((uint32_t)count);
+
+        if (send_packet(socket_fd, &message) == -1)
+            return -1;
+
+        return 0;
+    }
+
+    if (ferror(*file_to_send)) {
+        perror("fread");
+        return -1;
+    }
+
+    message.type = htonl(CHAT_MESSAGE_FILE_END);
+
+    if (send_packet(socket_fd, &message) == -1)
+        return -1;
+
+    fclose(*file_to_send);
+    *file_to_send = NULL;
+
+    printf("\nФайл %s отправлен.\n", filename);
+    printf("> ");
+    fflush(stdout);
+
+    return 0;
+}
+
+
+
+static void print_message(const ChatMessage *message) {
     uint32_t type = ntohl(message->type);
 
     if (type == CHAT_MESSAGE_JOIN) {
@@ -83,12 +144,86 @@ static void print_message(const ChatMessage *message)
     fflush(stdout);
 }
 
-int run_chat(const char *server_ip)
+
+static void handle_file_message(const ChatMessage *message,
+                                FILE **received_file,
+                                char *received_path,
+                                size_t path_size)
 {
+    uint32_t type = ntohl(message->type);
+
+    if (type == CHAT_MESSAGE_FILE_START) {
+        if (*received_file != NULL) {
+            fclose(*received_file);
+            *received_file = NULL;
+        }
+
+        const char *filename = strrchr(message->text, '/');
+        filename = filename != NULL ? filename + 1 : message->text;
+
+        if (filename[0] == '\0')
+            filename = "file.bin";
+
+        snprintf(received_path, path_size,
+                 "received_%s", filename);
+
+        *received_file = fopen(received_path, "wb");
+
+        if (*received_file == NULL) {
+            perror("fopen received file");
+            received_path[0] = '\0';
+            return;
+        }
+
+        printf("\nНачинается получение файла: %s\n", received_path);
+        return;
+    }
+
+    if (type == CHAT_MESSAGE_FILE_DATA) {
+        uint32_t length = ntohl(message->data_length);
+
+        if (length > sizeof(message->text)) {
+            fprintf(stderr, "Некорректный размер блока файла.\n");
+            return;
+        }
+
+        if (*received_file == NULL) {
+            fprintf(stderr, "Блок файла получен без FILE_START.\n");
+            return;
+        }
+
+        if (fwrite(message->text, 1, length,
+                   *received_file) != length) {
+            perror("fwrite");
+            fclose(*received_file);
+            *received_file = NULL;
+        }
+
+        return;
+    }
+
+    if (type == CHAT_MESSAGE_FILE_END) {
+        if (*received_file != NULL) {
+            fclose(*received_file);
+            *received_file = NULL;
+            printf("\nФайл сохранён: %s\n", received_path);
+            received_path[0] = '\0';
+        }
+    }
+}
+
+
+int run_chat(const char *server_ip) {
     int socket_fd = -1;
     int result = EXIT_FAILURE;
-    int leave_sent = 0;
     int running = 1;
+    FILE *file_to_send = NULL;
+    FILE *received_file = NULL;
+
+    char outgoing_filename[CHAT_TEXT_LENGTH] = {0};
+    char received_path[CHAT_TEXT_LENGTH + 16] = {0};
+
+    int file_start_pending = 0;
 
     struct sigaction action = {0};
     struct sigaction old_action;
@@ -145,10 +280,6 @@ int run_chat(const char *server_ip)
            server_ip, CHAT_PORT);
     printf("Введите сообщение или /quit для выхода.\n");
 
-    /*
-     * Отключаем буферизацию stdin, чтобы poll() корректно
-     * отслеживал ввод с клавиатуры.
-     */
     setvbuf(stdin, NULL, _IONBF, 0);
 
     struct pollfd descriptors[2] = {
@@ -166,6 +297,12 @@ int run_chat(const char *server_ip)
     size_t received_bytes = 0;
 
     while (running && !stop_requested) {
+        descriptors[0].events = POLLIN;
+
+        if (file_to_send != NULL) {
+            descriptors[0].events |= POLLOUT;
+        }
+            
         int ready = poll(descriptors, 2, 500);
 
         if (ready == -1) {
@@ -210,11 +347,36 @@ int run_chat(const char *server_ip)
             received_bytes += (size_t)count;
 
             if (received_bytes == sizeof(incoming)) {
-                incoming.hostname[CHAT_HOSTNAME_LENGTH - 1] = '\0';
-                incoming.text[CHAT_TEXT_LENGTH - 1] = '\0';
+                uint32_t type = ntohl(incoming.type);
 
-                print_message(&incoming);
+                incoming.hostname[CHAT_HOSTNAME_LENGTH - 1] = '\0';
+
+                if (type != CHAT_MESSAGE_FILE_DATA)
+                    incoming.text[CHAT_TEXT_LENGTH - 1] = '\0';
+
+                if (type == CHAT_MESSAGE_FILE_START ||
+                    type == CHAT_MESSAGE_FILE_DATA ||
+                    type == CHAT_MESSAGE_FILE_END) {
+                    handle_file_message(&incoming, &received_file,
+                                        received_path, sizeof(received_path));
+                } else {
+                    print_message(&incoming);
+                }
+
                 received_bytes = 0;
+            }
+        }
+
+        if (descriptors[0].revents & POLLOUT) {
+            if (file_to_send != NULL) {
+                if (send_next_file_part(socket_fd, &file_to_send,
+                                        hostname, outgoing_filename,
+                                        &file_start_pending) == -1) {
+                    fprintf(stderr, "Ошибка отправки файла.\n");
+                    fclose(file_to_send);
+                    file_to_send = NULL;
+                    file_start_pending = 0;
+                }
             }
         }
 
@@ -243,6 +405,47 @@ int run_chat(const char *server_ip)
                 break;
             }
 
+            if (strncmp(input, "/send ", 6) == 0) {
+                const char *path = input + 6;
+
+                if (file_to_send != NULL) {
+                    printf("Дождитесь завершения предыдущей передачи.\n");
+                    printf("> ");
+                    fflush(stdout);
+                    continue;
+                }
+
+                FILE *opened = fopen(path, "rb");
+
+                if (opened == NULL) {
+                    perror("fopen file to send");
+                    printf("> ");
+                    fflush(stdout);
+                    continue;
+                }
+
+                const char *filename = strrchr(path, '/');
+                filename = filename != NULL ? filename + 1 : path;
+
+                if (filename[0] == '\0') {
+                    fprintf(stderr, "Не удалось определить имя файла.\n");
+                    fclose(opened);
+                    printf("> ");
+                    fflush(stdout);
+                    continue;
+                }
+
+                snprintf(outgoing_filename, sizeof(outgoing_filename),
+                        "%s", filename);
+
+                file_to_send = opened;
+                file_start_pending = 1;
+
+                printf("Подготовлен файл к отправке: %s\n",
+                    outgoing_filename);
+                continue;
+            }
+
             if (input[0] == '\0') {
                 printf("> ");
                 fflush(stdout);
@@ -265,14 +468,8 @@ int run_chat(const char *server_ip)
         }
     }
 
-    /*
-     * Уведомляем сервер об уходе, если соединение ещё работает.
-     */
-    if (socket_fd != -1 && !leave_sent) {
-        if (send_message(socket_fd, CHAT_MESSAGE_LEAVE,
-                         hostname, NULL) == 0) {
-            leave_sent = 1;
-        }
+    if (socket_fd != -1) {
+        send_message(socket_fd, CHAT_MESSAGE_LEAVE, hostname, NULL)
     }
 
     result = EXIT_SUCCESS;
@@ -285,6 +482,14 @@ cleanup:
     if (sigaction(SIGINT, &old_action, NULL) == -1) {
         perror("sigaction restore");
         result = EXIT_FAILURE;
+    }
+
+    if (file_to_send != NULL) {
+        fclose(file_to_send);
+    }
+
+    if (received_file != NULL){
+        fclose(received_file);
     }
 
     return result;

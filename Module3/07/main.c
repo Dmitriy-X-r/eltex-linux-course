@@ -2,8 +2,7 @@
 
 #include <stdio.h>
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     if (argc > 2) {
         fprintf(stderr, "Использование: %s [IP-сервера]\n",
                 argv[0]);
