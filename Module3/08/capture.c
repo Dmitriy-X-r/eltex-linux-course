@@ -28,14 +28,12 @@
 
 static volatile sig_atomic_t stop_requested = 0;
 
-static void handle_sigint(int signal_number)
-{
+static void handle_sigint(int signal_number){
     (void)signal_number;
     stop_requested = 1;
 }
 
-static double elapsed_seconds(const struct timespec *start)
-{
+static double elapsed_seconds(const struct timespec *start){
     struct timespec now;
 
     if (clock_gettime(CLOCK_MONOTONIC, &now) == -1) {
@@ -46,8 +44,7 @@ static double elapsed_seconds(const struct timespec *start)
            (double)(now.tv_nsec - start->tv_nsec) / 1000000000.0;
 }
 
-static void output(FILE *log, const char *format, ...)
-{
+static void output(FILE *log, const char *format, ...){
     va_list args;
     va_list file_args;
 
@@ -64,8 +61,7 @@ static void output(FILE *log, const char *format, ...)
     fflush(log);
 }
 
-static void print_mac(FILE *log, const unsigned char *mac)
-{
+static void print_mac(FILE *log, const unsigned char *mac){
     output(log, "%02x:%02x:%02x:%02x:%02x:%02x",
            mac[0], mac[1], mac[2],
            mac[3], mac[4], mac[5]);
@@ -86,10 +82,6 @@ static int is_dns_packet(uint16_t source_port,
         return 0;
     }
 
-    /*
-     * Проверяем, что флаги и счётчики соответствуют
-     * допустимому DNS-сообщению.
-     */
     uint16_t flags =
         ((uint16_t)payload[2] << 8) | payload[3];
 
@@ -112,8 +104,7 @@ static int is_dns_packet(uint16_t source_port,
 
     /*
      * У DNS-запроса обычно есть хотя бы один вопрос.
-     * Ответ может содержать вопросы, ответы и дополнительные
-     * записи, но пустой пакет без записей не принимаем.
+     * Пустой пакет без записей не принимаем.
      */
     if (questions == 0 &&
         answers == 0 &&
@@ -150,9 +141,7 @@ static int is_chat_packet(uint16_t source_port,
     return 1;
 }
 
-static void print_chat_details(FILE *log,
-                               const unsigned char *payload)
-{
+static void print_chat_details(FILE *log, const unsigned char *payload){
     ChatMessage message;
     memcpy(&message, payload, sizeof(message));
 
@@ -187,9 +176,7 @@ static void print_chat_details(FILE *log,
     }
 }
 
-static void print_dns_details(FILE *log,
-                              const unsigned char *payload)
-{
+static void print_dns_details(FILE *log, const unsigned char *payload){
     uint16_t id =
         ((uint16_t)payload[0] << 8) | payload[1];
 
@@ -217,10 +204,6 @@ static int process_packet(const unsigned char *buffer,
                           double elapsed,
                           FILE *log)
 {
-    /*
-     * Минимальный Ethernet-заголовок.
-     * Если кадр слишком короткий, читать его нельзя.
-     */
     if (packet_length < sizeof(struct ether_header)) {
         return 0;
     }
@@ -228,7 +211,7 @@ static int process_packet(const unsigned char *buffer,
     struct ether_header ethernet;
     memcpy(&ethernet, buffer, sizeof(ethernet));
 
-    /* Пока обрабатываем только IPv4. */
+    /* Обрабатываем только IPv4. */
     if (ntohs(ethernet.ether_type) != ETHERTYPE_IP) {
         return 0;
     }
@@ -347,8 +330,7 @@ static int process_packet(const unsigned char *buffer,
     return 1;
 }
 
-int run_capture(int filter, int duration_seconds)
-{
+int run_capture(int filter, int duration_seconds) {
     if ((filter != CHAT_FILTER && filter != DNS_FILTER) ||
         duration_seconds < 1 || duration_seconds > 3600) {
         fprintf(stderr, "Некорректные параметры захвата.\n");

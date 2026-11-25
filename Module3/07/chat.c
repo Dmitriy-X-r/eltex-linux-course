@@ -469,7 +469,7 @@ int run_chat(const char *server_ip) {
     }
 
     if (socket_fd != -1) {
-        send_message(socket_fd, CHAT_MESSAGE_LEAVE, hostname, NULL)
+        send_message(socket_fd, CHAT_MESSAGE_LEAVE, hostname, NULL);
     }
 
     result = EXIT_SUCCESS;
