@@ -1,0 +1,11 @@
+#ifndef PROTOCOL_H
+#define PROTOCOL_H
+
+#define SERVER_DEFAULT_PORT 9000
+#define MAX_MESSAGE_SIZE 1024
+
+#define CLOSE_MESSAGE "__RAW_ECHO_CLOSE__"
+
+#define CLIENT_BUCKET_COUNT 257
+
+#endif
